@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Website Tiles from CSV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f2f5;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 30px 0 10px;
+      color: #333;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      padding: 10px 20px 20px;
+    }
+
+    #search-input {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      transition: box-shadow 0.2s ease-in-out;
+    }
+
+    #search-input:focus {
+      box-shadow: 0 0 5px #0078d7;
+      border-color: #0078d7;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .tile {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .tile:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+    }
+
+    .tile img {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 12px;
+    }
+
+    .tile-title {
+      font-weight: 600;
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .tile-url {
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 10px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      background-color: #e4e6eb;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #555;
+    }
+
+    #no-results {
+      text-align: center;
+      color: #888;
+      padding: 30px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Website Tiles</h1>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <input type="text" id="search-input" placeholder="Search by name or tags..." />
+  </div>
+
+  <!-- Tiles Container -->
+  <div id="tiles-container" class="grid"></div>
+  <div id="no-results" style="display:none;">No matching tiles found.</div>
+
+  <!-- Load PapaParse -->
+  <script src="./config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <script>
+    const csvUrl = sites.gitUrl; // from config.js
+    let allSites = [];
+
+    // Fetch and parse CSV
+    fetch(csvUrl)
+      .then((res) => res.text())
+      .then((csv) => {
+        Papa.parse(csv, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            allSites = results.data;
+            renderTiles(allSites);
+          },
+        });
+      })
+      .catch((err) => {
+        console.error("CSV Load Error:", err);
+        document.getElementById("tiles-container").innerHTML = "<p style='text-align:center;'>Failed to load site data.</p>";
+      });
+
+    // Render tiles
+    function renderTiles(data) {
+      const container = document.getElementById("tiles-container");
+      const noResults = document.getElementById("no-results");
+      container.innerHTML = "";
+
+      if (!data.length) {
+        container.style.display = "none";
+        noResults.style.display = "block";
+        return;
+      }
+
+      container.style.display = "grid";
+      noResults.style.display = "none";
+
+      data.forEach(site => {
+        if (!site.url || !site.name) return;
+
+        let hostname = "";
+        try {
+          hostname = new URL(site.url).hostname;
+        } catch {
+          return;
+        }
+
+        const tags = (site.tags || "").split(",").map(tag => tag.trim()).filter(Boolean);
+
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.onclick = () => window.open(site.url, "_blank");
+
+        tile.innerHTML = `
+          <img src="${site.icon || 'https://via.placeholder.com/32'}" alt="${site.name} icon">
+          <div class="tile-title">${site.name}</div>
+          <div class="tile-url">${hostname}</div>
+          <div class="tags">
+            ${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
+          </div>
+        `;
+
+        container.appendChild(tile);
+      });
+    }
+
+    // Filter tiles on input
+    document.getElementById("search-input").addEventListener("input", function () {
+      const query = this.value.toLowerCase().trim();
+
+      const filtered = allSites.filter(site => {
+        const name = site.name?.toLowerCase() || "";
+        const tags = site.tags?.toLowerCase() || "";
+        return name.includes(query) || tags.includes(query);
+      });
+
+      renderTiles(filtered);
+    });
+  </script>
+</body>
+</html>
