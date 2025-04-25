@@ -1,14 +1,14 @@
 name,url,icon,tags,category
-Google,https://www.google.com,https://www.google.com/favicon.ico,search,tech,Utilities
-GitHub,https://github.com,https://github.githubassets.com/favicons/favicon.svg,code,developer,Social
-YouTube,https://youtube.com,https://www.youtube.com/s/desktop/57a9c88b/img/favicon.ico,video,entertainment,Social
-OpenAI,https://openai.com,https://openai.com/favicon.ico,ai,tech,innovation,Utilities
-Image to Text,https://www.imagetotext.info,https://www.imagetotext.info/web_assets/frontend/img/logo.svg?v4.3.4,ocr,image,Utilities
-Epoch Converter,https://www.epochconverter.com,https://www.epochconverter.com/img/epochconverter.svg,time,conversion,Utilities
-Sales Report,https://example.com/sales.xlsx,https://via.placeholder.com/32,excel,report,Excels
-Client Data,https://example.com/client.xlsx,https://via.placeholder.com/32,data,excel,Excels
-Epoch Converter,https://www.epochconverter.com,https://www.epochconverter.com/img/epochconverter.svg,converter,Utilities
-Render,https://render.com,http://www.w3.org/2000/svg,Hosting,Platform
-Resend,https://resend.com,http://www.w3.org/2000/svg,Mail Server,MailServers
-Jam Dev Utils,https://jam.dev/utilities,http://www.w3.org/2000/svg,Tools,Utilities
-Cron-Job,https://console.cron-job.org,https://console.cron-job.org/static/media/logo.57120238b03f90fbac58.png,Cron,Utilities
+Google,https://www.google.com,https://www.google.com/favicon.ico,search;tech,Utilities,
+GitHub,https://github.com,https://github.githubassets.com/favicons/favicon.svg,code,developer,Social,
+YouTube,https://youtube.com,https://www.youtube.com/s/desktop/57a9c88b/img/favicon.ico,video;entertainment,Social,
+OpenAI,https://openai.com,https://openai.com/favicon.ico,ai;tech;innovation,Utilities
+Image to Text,https://www.imagetotext.info,https://www.imagetotext.info/web_assets/frontend/img/logo.svg?v4.3.4,ocr,image,Utilities,
+Epoch Converter,https://www.epochconverter.com,https://www.epochconverter.com/img/epochconverter.svg,time;conversion,Utilities,
+Sales Report,https://example.com/sales.xlsx,https://via.placeholder.com/32,excel;report,Excels,
+Client Data,https://example.com/client.xlsx,https://via.placeholder.com/32,data;excel,Excels,
+Epoch Converter,https://www.epochconverter.com,https://www.epochconverter.com/img/epochconverter.svg,converter,Utilities,,
+Render,https://render.com,http://www.w3.org/2000/svg,Hosting,Platform,,
+Resend,https://resend.com,http://www.w3.org/2000/svg,Mail Server,MailServers,,
+Jam Dev Utils,https://jam.dev/utilities,http://www.w3.org/2000/svg,Tools,Utilities,,
+Cron-Job,https://console.cron-job.org,https://console.cron-job.org/static/media/logo.57120238b03f90fbac58.png,Cron,Utilities,,

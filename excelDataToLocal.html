@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Website Tiles from CSV</title>
+  <title>Website Tiles by Category</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * {
@@ -44,14 +44,25 @@
       border-color: #0078d7;
     }
 
+    .category-section {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+    }
+
+    .category-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #444;
+      margin: 30px 0 15px;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 5px;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
-      padding: 20px;
-      max-width: 1200px;
-      margin: auto;
-      min-height: 200px;
     }
 
     .tile {
@@ -110,7 +121,6 @@
       padding: 30px;
       font-size: 18px;
       display: none;
-      grid-column: 1 / -1;
     }
   </style>
 </head>
@@ -118,16 +128,13 @@
 <body>
   <h1>Website Tiles</h1>
 
-  <!-- Search Bar -->
   <div class="search-container">
     <input type="text" id="search-input" placeholder="Search by name or tags..." />
   </div>
 
-  <!-- Tiles Container -->
-  <div id="tiles-container" class="grid"></div>
+  <div id="tiles-wrapper"></div>
   <div id="no-results">No matching tiles found.</div>
 
-  <!-- Load PapaParse and config -->
   <script src="./config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
@@ -143,53 +150,75 @@
           skipEmptyLines: true,
           complete: (results) => {
             allSites = results.data;
-            renderTiles(allSites);
+            renderGroupedTiles(allSites);
           },
         });
       })
       .catch((err) => {
         console.error("CSV Load Error:", err);
-        document.getElementById("tiles-container").innerHTML = "<p style='text-align:center;'>Failed to load site data.</p>";
+        document.getElementById("tiles-wrapper").innerHTML = "<p style='text-align:center;'>Failed to load site data.</p>";
       });
 
-    function renderTiles(data) {
-      const container = document.getElementById("tiles-container");
+    function renderGroupedTiles(data) {
+      const wrapper = document.getElementById("tiles-wrapper");
       const noResults = document.getElementById("no-results");
-      container.innerHTML = "";
+      wrapper.innerHTML = "";
+      noResults.style.display = "none";
 
       if (!data.length) {
         noResults.style.display = "block";
         return;
       }
 
-      noResults.style.display = "none";
+      const grouped = {};
 
       data.forEach(site => {
-        if (!site.url || !site.name) return;
+        const category = site.category || "Uncategorized";
+        if (!grouped[category]) grouped[category] = [];
+        grouped[category].push(site);
+      });
 
-        let hostname = "";
-        try {
-          hostname = new URL(site.url).hostname;
-        } catch {
-          return;
-        }
+      Object.entries(grouped).forEach(([category, items]) => {
+        const section = document.createElement("div");
+        section.className = "category-section";
 
-        const tags = (site.tags || "").split(",").map(tag => tag.trim()).filter(Boolean);
+        const title = document.createElement("div");
+        title.className = "category-title";
+        title.textContent = category;
 
-        const tile = document.createElement("div");
-        tile.className = "tile";
-        tile.onclick = () => window.open(site.url, "_blank");
+        const grid = document.createElement("div");
+        grid.className = "grid";
 
-        tile.innerHTML = `
-          <img src="${site.icon || 'https://via.placeholder.com/32'}" alt="${site.name} icon">
-          <div class="tile-title">${site.name}</div>
-          <div class="tile-url">${hostname}</div>
-          <div class="tags">
-            ${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
-          </div>
-        `;
+        items.forEach(site => {
+          if (!site.url || !site.name) return;
+          let hostname = "";
+          try {
+            hostname = new URL(site.url).hostname;
+          } catch {
+            return;
+          }
 
-        container.appendChild(tile);
+          const tags = (site.tags || "").split(",").map(tag => tag.trim()).filter(Boolean);
+
+          const tile = document.createElement("div");
+          tile.className = "tile";
+          tile.onclick = () => window.open(site.url, "_blank");
+
+          tile.innerHTML = `
+            <img src="${site.icon || 'https://via.placeholder.com/32'}" alt="${site.name} icon">
+            <div class="tile-title">${site.name}</div>
+            <div class="tile-url">${hostname}</div>
+            <div class="tags">
+              ${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
+            </div>
+          `;
+
+          grid.appendChild(tile);
+        });
+
+        section.appendChild(title);
+        section.appendChild(grid);
+        wrapper.appendChild(section);
       });
     }
 
@@ -202,7 +231,7 @@
         return name.includes(query) || tags.includes(query);
       });
 
-      renderTiles(filtered);
+      renderGroupedTiles(filtered);
     });
   </script>
 </body>
