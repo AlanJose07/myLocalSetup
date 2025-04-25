@@ -51,6 +51,7 @@
       padding: 20px;
       max-width: 1200px;
       margin: auto;
+      min-height: 200px;
     }
 
     .tile {
@@ -108,6 +109,8 @@
       color: #888;
       padding: 30px;
       font-size: 18px;
+      display: none;
+      grid-column: 1 / -1;
     }
   </style>
 </head>
@@ -122,17 +125,16 @@
 
   <!-- Tiles Container -->
   <div id="tiles-container" class="grid"></div>
-  <div id="no-results" style="display:none;">No matching tiles found.</div>
+  <div id="no-results">No matching tiles found.</div>
 
-  <!-- Load PapaParse -->
+  <!-- Load PapaParse and config -->
   <script src="./config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <script>
-    const csvUrl = sites.gitUrl; // from config.js
+    const csvUrl = sites.gitUrl;
     let allSites = [];
 
-    // Fetch and parse CSV
     fetch(csvUrl)
       .then((res) => res.text())
       .then((csv) => {
@@ -150,19 +152,16 @@
         document.getElementById("tiles-container").innerHTML = "<p style='text-align:center;'>Failed to load site data.</p>";
       });
 
-    // Render tiles
     function renderTiles(data) {
       const container = document.getElementById("tiles-container");
       const noResults = document.getElementById("no-results");
       container.innerHTML = "";
 
       if (!data.length) {
-        container.style.display = "none";
         noResults.style.display = "block";
         return;
       }
 
-      container.style.display = "grid";
       noResults.style.display = "none";
 
       data.forEach(site => {
@@ -194,7 +193,6 @@
       });
     }
 
-    // Filter tiles on input
     document.getElementById("search-input").addEventListener("input", function () {
       const query = this.value.toLowerCase().trim();
 
